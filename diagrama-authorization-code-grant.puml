@@ -1,0 +1,28 @@
+@startuml
+skinparam sequence {
+    ActorBackgroundColor #E3F2FD
+    ParticipantBackgroundColor #FCE4EC
+    ParticipantBorderColor #FF80AB
+    ArrowColor #0288D1
+    LifeLineBorderColor #0288D1
+    LifeLineBackgroundColor #E1F5FE
+}
+
+actor Usuario as User
+participant Cliente as Client
+participant "Authorization Server" as AS #FFCDD2
+participant "Resource Server" as RS #C8E6C9
+
+User -> Client: Inicia sesión/autorización
+Client -> AS: <color:#D32F2F><b>POST /par</b></color>\n(Parámetros de Autorización)
+AS -> Client: Retorna request_uri
+Client -> User: Redirige a <color:#D32F2F>/authorize</color>?request_uri
+User -> AS: Aprueba/deniega la solicitud
+AS -> Client: Redirige con <color:#D32F2F>Authorization Code</color>
+Client -> AS: <color:#1976D2><b>POST /token</b></color>\n(Authorization Code + Credenciales del Cliente)
+AS -> Client: Access Token (y opcionalmente ID Token + Refresh Token)
+Client -> RS: <color:#388E3C><b>GET /resource</b></color>\n(Authorization: Bearer Token)
+RS -> AS: <color:#00796B><b>POST /introspect</b></color>\n(Access Token)
+AS -> RS: Metadata del Token (Activo/Válido)
+RS -> Client: Datos del Recurso
+@enduml
